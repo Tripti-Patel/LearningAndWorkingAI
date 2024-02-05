@@ -12,3 +12,4 @@ LearningAndWorkingAI
     -TreeModels
     -UnsupervisedLearning-Clustering
     -UnsupervisedLearning-PCA
+    -Exploring Cognitive Vision
