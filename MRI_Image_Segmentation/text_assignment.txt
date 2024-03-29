@@ -1,0 +1,123 @@
+Region growing 2D segmentation
+------ Overall Metrics ------
+Dice Coefficient: 0.863014335655517
+Jaccard Index: 0.7695333073701955
+Pixel Accuracy: 0.790069877431547
+Sensitivity: 0.9108712283348773
+Specificity: 0.308187277903576
+
+------ Overall Metrics ------
+Dice Coefficient: 0.8309767649438278
+Jaccard Index: 0.7367163072007323
+Pixel Accuracy: 0.7450885726413771
+Sensitivity: 0.9513460425686068
+Specificity: 0.23309783725780647
+
+
+The goal of this assignment is to use image processing methods to accurately identify and separate different brain tissue layers in MRI (Magnetic Resonance Imaging) data. This involves segmenting areas such as the scalp, skull, cerebrospinal fluid (CSF), gray matter, and white matter from the MRI images. We are expected to extend our knowledge, skills and information given in the class and apply different algorithms and techniques in practical way. To do this, we are supposed to do 3 major task. First, apply different alrithms and combination of techniques to segment MRI images. Also, apply the same set of techniques and algorithm to every slice. Secondly, compare and evaluate the results of different techniques used in previous phase with given groud truth that is labeled images. Using this evalution highlight the best or worst algorithm with stating proper reason and its working behind it. Lastly, apply advanced segmentation algorithms to perform 3D image segmentation which can be applied to all slices simultaneously. Further more, discuss about the better or worse algorithm than those used 2D tissue segmentation(Task 1) and same evalution matrix in Task 2. Overall, the objective is to analyze MRI data effectively to aid in medical diagnosis and research.
+----
+New: This assignment aims to accurately segment brain tissue layers in MRI scans using advanced image processing techniques. Dividing regions like scalp, skull, CSF, gray matter, and white matter is crucial. Through systematic application of learned techniques, algorithms are deployed consistently across all image slices. Results are meticulously evaluated against ground truth to determine algorithm efficacy. Additionally, advanced 3D segmentation methods are explored and compared to 2D techniques. Ultimately, the goal is to effectively analyze MRI data, contributing to medical diagnosis and research.
+
+------
+
+Method:
+To segment MRI images into six different regions, I experimented with and implemented Otsu, K-means, Adaptive Mean, and region growing algorithms. The primary reason for utilizing these algorithms is that they aim to partition image data into meaningful regions or clusters based on certain criteria, such as intensity values. This is particularly useful in MRI image segmentation, where different tissue types often exhibit distinct intensity patterns. Moreover, Otsu's method, K-means clustering, Mean shift and Region growing are unsupervised techniques and do not require labeled data for training. This is advantageous in MRI image segmentation because it allows for automatic segmentation without the need for manual annotation. Their adaptability, computational efficiency, and ability to handle unsupervised segmentation make them particularly well-suited for analyzing MRI data. Now, let's discuss each of them in detail.
+
+--------------
+New: In segmenting MRI images into six regions, Otsu's method, K-means clustering, Mean shift, and Region growing algorithms were experimented with. These unsupervised techniques partition image data based on intensity values, advantageous for MRI segmentation where tissue types exhibit distinct intensity patterns. Their adaptability and computational efficiency make them well-suited for automatic segmentation without manual annotation.
+
+---------------
+
+Otsu's Segmentation: 
+
+Binary Otsu segmentation automatically determines the optimal threshold to separate foreground and background in an image by maximizing the between-class variance of pixel intensities. The process begins by calculating the histogram of pixel intensities in the image (Histogram Calculation). It then iterates through all possible threshold values and calculates the between-class variance for each threshold (Threshold Selection). The threshold value that maximizes the between-class variance is chosen as the optimal threshold for segmentation. Subsequently, pixels with intensities higher than the threshold are assigned to the foreground (object), while pixels with intensities lower than the threshold are assigned to the background (Image Segmentation). This method is particularly advantageous for MRI image segmentation as it effectively handles bimodal intensity distributions, eliminates the need for manual threshold selection, and exhibits computational efficiency.
+
+Multi Otsu Segmentation:
+Multi-Otsu thresholding expands on Otsu's method by segmenting images into multiple classes, in our case, six regions representing different tissue types in MRI images. It begins by calculating pixel intensity histograms, iteratively selecting thresholds to divide the histogram into classes, and then segmenting the image into regions based on these thresholds. Each region corresponds to a specific tissue type. This approach provides more accurate segmentation compared to binary Otsu, enhancing data analysis. In the experiment, the 'multi_otsu_segmentation' function processes each T1 image slice, calculating thresholds using Multi-Otsu, then generating regions based on these thresholds. The output labels each pixel according to its region, displayed alongside ground truth and labeled images for each slice.
+
+K-Means:
+K-means clustering groups data into clusters based on similarities by iteratively assigning points to clusters and updating centroids until convergence. It's useful in MRI image segmentation for distinguishing tissue types based on intensity values, providing computational efficiency and ease of use. However, its effectiveness depends on factors like initial centroid values, noise, and the number of clusters chosen. 
+
+In the experiment, I employ a function called 'kmeans_segmentation' to process a slice of the T1 image. This slice undergoes min-max normalization, ensuring its pixel intensity values range from 0 to 255. This step is crucial as MRI images often have large intensity ranges. The image is then reshaped into a 1D array to prepare it for clustering, as K-means operates on flattened data where each pixel is treated as a separate data point. Utilizing sklearn's KMeans function, I set the number of clusters to 5 (since K-means starts indexing clusters from 0) to obtain 6 segmented regions. Additionally, parameters such as max_iter (controlling the maximum number of algorithm iterations) and n_init (determining the number of times the algorithm is run with different initial centroid seeds) are specified. Finally, the function returns the segmented image, which is then displayed alongside the ground truth and labeled image for each slice. 
+
+2. 
+
+Adaptive Mean Segmentation: 
+Adaptive Mean Segmentation analyzes each pixel's local neighborhood, computes the mean intensity within it, and segments the image based on a threshold relative to this local mean intensity. This iterative process adjusts the threshold until convergence, enhancing MRI image segmentation by accommodating local intensity variations, preserving edges, reducing bias, and resisting noise.
+
+In the experiment, T1 data slices are normalized and converted to 'uint8'. The 'adaptive_threshold_mean' function then produces the thresholded image using parameters like maximum pixel value, adaptive thresholding method, binarization method, neighborhood size, and a constant for threshold refinement.
+/* Region Growing:
+Region growing is a pixel-based segmentation method that groups adjacent pixels with similar characteristics into coherent regions. It begins from seed points and adds neighboring pixels to the region if they meet similarity criteria, stopping when no more pixels can be added. The implementation draws inspiration from various research papers and tutorials.
+
+In 2D segmentation with 4-connectivity, each pixel is linked to its four immediate neighbors. Region growing examines intensity similarity between the seed pixel and its neighbors. If a neighboring pixel meets the criteria, it's added to the region recursively. This results in smoother boundaries and less noise sensitivity than 8-connectivity.
+
+For the experiment, seed points and thresholds for each label are determined. Each T1 image passes through the 'region_growing' function with seed points and thresholds. It normalizes the image, creates a binary mask for segmentation, initializes a seed point list, and iteratively adds neighboring pixels to the region. The segmented masks are stored, and a function merges them for visualization.
+
+
+Result: 
+ 
+
+Here, Table 1 presents various algorithms employed in the experiment, with their respective results listed in columns. These results represent the mean values of algorithm performance across the entire set of T1 images.  
+
+Adaptive Mean
+Otsu
+Multi Otsu
+K-Mean
+Region Growing
+
+3D Region Growing
+
+* State reason of choosing dice_coefficient, jaccard_index, pixel_accuracy, sensitivity, specificity, computation time 
+
+dice_coefficient: The Dice coefficient ranges from 0 to 1, showing how much overlap there is between the segmented and true regions. A score of 0 means no overlap, while a score of 1 means a perfect match.
+It's a popular metric for checking image segmentation quality because it balances sensitivity (recall) and precision. This makes it useful for checking algorithms, especially on datasets with unbalanced classes or when regions vary in size. Also, it's sensitive to both false positives and negatives, giving a good overall measure of segmentation accuracy. Higher Dice scores mean better agreement, showing how well the segmented areas match the true ones.
+
+jaccard_index: The Jaccard index, or intersection over union (IoU), measures how much a segmented region overlaps with the ground truth in image segmentation. It's calculated by dividing the number of common pixels by the total number of pixels in both regions. Ranging from 0 to 1, where 0 means no overlap and 1 means perfect agreement, it's a simple and intuitive metric for assessing segmentation accuracy. Its sensitivity to false positives and negatives makes it effective for evaluating segmentation quality across different datasets or algorithms. Higher Jaccard index values indicate better agreement between segmented and ground truth regions, making it valuable for image segmentation evaluation.
+
+Pixel Accuracy: Pixel accuracy measures the percentage of correctly classified pixels compared to the total number of pixels in an image. It's a simple and easy-to-understand metric for evaluating image segmentation performance. While useful for overall assessment, it doesn't consider spatial details or boundary accuracy. However, it's effective when class imbalances are low and precise boundaries are not crucial.
+
+Sensitivity measures how well the algorithm detects true positives, while specificity assesses its ability to avoid false positives. Both are important for evaluating the accuracy of image segmentation algorithms in medical imaging.
+
+-------
+
+Dice Coefficient: Ranges from 0 to 1, indicating the overlap between segmented and true regions. Higher scores signify better agreement. Balances sensitivity and precision, making it ideal for assessing segmentation quality, especially in datasets with unbalanced classes. Sensitive to false positives and negatives, providing a comprehensive measure of accuracy.
+
+Jaccard Index: Also known as intersection over union (IoU), measures overlap between segmented and ground truth regions. Ranges from 0 to 1, with higher values indicating better agreement. Simple and intuitive metric, effective for evaluating segmentation accuracy across different datasets. Sensitive to false positives and negatives, valuable for segmentation evaluation.
+
+Pixel Accuracy: Measures the percentage of correctly classified pixels compared to the total number of pixels in an image. Simple and easy-to-understand metric for overall evaluation. Doesn't consider spatial details or boundary accuracy but effective when class imbalances are low.
+
+Sensitivity and Specificity: Sensitivity assesses how well the algorithm detects true positives, while specificity measures its ability to avoid false positives. Both are crucial for evaluating segmentation accuracy in medical imaging. Sensitivity and specificity provide insights into the algorithm's performance in detecting and avoiding false classifications.
+---------
+3D Segmentation:
+Region Growing, in advanced 2D segmentation or 3D segmentation with 8-connectivity, each pixel (or voxel in 3D) is considered to have connections to its eight immediate neighbors (above, below, left, right, and diagonally). Region growing with 8-connectivity considers a broader range of neighboring pixels, leading to more accurate segmentation, particularly in regions with complex shapes or sharp boundaries. This connectivity allows for better preservation of fine details and edges within the segmented regions, making it suitable for advanced segmentation tasks where precise delineation of structures is required.  
+
+Overall, region growing is helpful in MRI image segmentation into six parts because it can effectively delineate homogeneous regions corresponding to different tissue types or structures in the MRI data. Its adaptability to varying intensities, ability to handle noise, and flexibility in connectivity make it an effective and versatile segmentation technique for both 2D and 3D MRI data. 
+
+In the experiment, T1 data is normalized, and seed points along with thresholds for 3D segmentation are determined. The 'region_growing_advanced_segmentation' function initializes a segmented array to store segmented regions. Using a deque, it iteratively processes points, checking if they're within image bounds and unprocessed. Points with intensity differences below the threshold are labeled as part of the segmented region. Neighboring points are enqueued for further processing. The function returns the segmented array.
+
+Result:
+
+1. The results obtained from K-Means clustering indicate suboptimal performance. Possible factors contributing to this outcome include the selection of initial centroid seed values, the choice of the number of clusters (K), and the maximum number of iterations. Notably, K-Means demonstrates satisfactory specificity and pixel accuracy, indicating its ability to accurately classify true negatives or regions of tissues not belonging to specific parts in the ground truth. Additionally, the mean computation time of the algorithm is relatively high, suggesting that it takes considerable time to converge.
+2. The Multi-Otsu method outperformed K-Means and Adaptive Mean algorithm due to its ability to directly identify optimal thresholds from intensity histograms, leading to precise delineation of multiple regions. Moreover, Multi-Otsu exhibits shorter computation times compared to K-Means and Adaptive Mean. However, despite these advantages, the overall results are not entirely satisfactory due to intensity inconsistencies and overlapping tissue intensities, resulting in inaccurate segmentation.
+3. Adaptive mean segmentation performed poorly in image segmentation due to its reliance on local intensity variations, which may not effectively capture complex intensity patterns. Additionally, the method might also struggle to adapt to regions with inconsistent intensities, leading to inaccurate segmentation.
+4.Region growing demonstrated exceptional performance in 2D image segmentation compared to other algorithms, with minimal computation time. Its success can be attributed to its capability to accurately capture local intensity similarities, adapt to tissue boundaries, and utilize precise seed points and threshold values. However, its ability to classify true negatives was not optimal, as it struggled to exclude regions of tissues not corresponding to specific parts in the ground truth.
+
+5. Region Growing 3D performed exceptionally well, yielding satisfying and acceptable results. With 8-pixel connectivity, the algorithm achieved an impressive accuracy of 95%, effectively classifying pixels corresponding to specific regions compared to the ground truth. The accurate selection of seed points and thresholds contributed to its success. However, the computation time of 3D region growing is longer than that of 2D region growing due to the increased number of neighboring pixels checked (8 in 3D versus 4 in 2D), resulting in longer processing times.
+
+Conclusion: 
+
+Overall, region growing proves invaluable in segmenting MRI images into six distinct parts, adeptly delineating homogeneous regions representing various tissue types or structures within the MRI data. Its adaptability to diverse intensity levels, robust noise handling capabilities, and versatility in connectivity render it an effective technique for both 2D and 3D MRI data segmentation. Nevertheless, the optimal selection of seed points and thresholds remains pivotal for maximizing algorithm performance.
+
+
+
+* Add techniques used along with method in task 2 and task 3. Why specific algorithm worked and why it did not worked
+* Add reason why used specific metric
+* Region growing paper in type 2: 
+1. https://www.sciencedirect.com/science/article/pii/S1110016823005082 
+2. https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8321280/
+3. https://bmcmedimaging.biomedcentral.com/articles/10.1186/s12880-022-00812-7
+Tutorial: 
+4. https://www.sciencedirect.com/topics/mathematics/region-growing#:~:text=Region%20growing%20starts%20with%20a,a%20meaningful%20part%20of%20it.
+5. https://sbme-tutorials.github.io/2019/cv/notes/6_week6.html
+and type 3
+https://sbme-tutorials.github.io/2018/cv/notes/7_week7.html
